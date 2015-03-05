@@ -50,7 +50,7 @@ var Mixin = {
     this.setupWatches(watches);
   },
   componentWillReceiveProps: function(nextProps) {
-    var watches = parseWatchExpr(nextProps);
+    var watches = parseWatchExpr(nextProps.watch);
     this.setupWatches(watches);
   },
   setupWatches: function(watches) {

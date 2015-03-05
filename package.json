@@ -1,0 +1,19 @@
+{
+  "name": "tv.js",
+  "version": "0.0.1",
+  "description": "",
+  "main": "tv.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guregu/tv.js"
+  },
+  "keywords": [],
+  "author": "Gregory Roseberry <greg@toki.waseda.jp>",
+  "license": "BSD",
+  "devDependencies": {
+
+  },
+  "dependencies": {
+  	
+  }
+}

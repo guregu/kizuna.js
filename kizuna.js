@@ -89,11 +89,7 @@ var Mixin = {
         this.props.onKizuna(ref, data, metadata)
       }.bind(this);
     }
-    if (this.state[ref] !== data) {
-      this.setState(state, callback);
-    } else {
-      callback();
-    }
+    this.setState(state, callback);
   },
   componentWillUpdate: function(nextProps, nextState) {
     var watches = this.watches;

@@ -1,19 +1,15 @@
 {
-  "name": "tv",
+  "name": "kizuna",
   "version": "0.0.1",
-  "description": "",
-  "main": "tv.js",
+  "description": "two-way binding global data store thing for React",
+  "main": "kizuna.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/guregu/tv.js"
+    "url": "https://github.com/guregu/kizuna.js"
   },
   "keywords": [],
   "author": "Gregory Roseberry <greg@toki.waseda.jp>",
   "license": "BSD",
-  "devDependencies": {
-
-  },
-  "dependencies": {
-
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }

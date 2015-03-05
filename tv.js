@@ -93,8 +93,8 @@ var Mixin = {
     var watches = this.watches;
     watches.forEach(function (watch) {
       if (typeof this.state[watch.ref] !== "undefined" &&
-         this.state[watch.ref] !== nextState[watch.ref] &&
-         watch.store.get() !== nextState[watch.ref]) {
+          this.state[watch.ref] !== nextState[watch.ref] &&
+          watch.store.get() !== nextState[watch.ref]) {
         watch.store.set(nextState[watch.ref], {src: "componentWillUpdate"});
       }
     }.bind(this));

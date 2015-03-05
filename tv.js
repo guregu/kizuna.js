@@ -106,6 +106,10 @@ function parseWatchExpr(watchExpr) {
     return {};
   }
 
+  if (Object.prototype.toString.call(watchExpr) != "[object Array]") {
+    return parseWatchObject(watchExpr);
+  }
+
   var watches = [];
   watchExpr.forEach(function (watch) {
     var id, ref;
@@ -118,6 +122,15 @@ function parseWatchExpr(watchExpr) {
     } else {
       throw "TV: invalid watch expression";
     }
+    watches.push({id: id, ref: ref});
+  });
+  return watches;
+}
+
+function parseWatchObject(watchExpr) {
+  var watches = [];
+  Object.keys(watchExpr).forEach(function (ref) {
+    var id = watchExpr[ref];
     watches.push({id: id, ref: ref});
   });
   return watches;

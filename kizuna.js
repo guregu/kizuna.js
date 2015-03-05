@@ -46,17 +46,26 @@ function Store(id) {
 
 var Mixin = {
   componentWillMount: function() {
-    var watches = parseWatchExpr(this.props.watch);
+    var watches = parseWatchExpr(this.props.binding);
     this.setupWatches(watches);
+  },
+  componentDidMount: function() {
+    var watches = this.watches;
+    watches.forEach(function (watch) {
+      if (watch.store.get() !== this.state[watch.ref]) {
+        watch.store.set(this.state[watch.ref]);
+      }
+    });
   },
   componentWillReceiveProps: function(nextProps) {
     var watches = parseWatchExpr(nextProps.watch);
     this.setupWatches(watches);
   },
   setupWatches: function(watches) {
-    // TODO: instead of removing everything, only remove what we need to
-    if (this.watches && this.watches.length > 0) {
-      this.componentWillUnmount(); // TODO: split this?
+    if (this.watches && this.watches != watches) {
+      return; // nothing's changed, no need to do anything
+    } else if (this.watches) {
+      this.removeWatches(); 
     }
 
     this.watches = [];
@@ -75,35 +84,41 @@ var Mixin = {
     var state = {};
     state[ref] = data;
     var callback = null;
-    if (this.props.onTV) {
+    if (this.props.onKizuna) {
       callback = function() {
-        this.props.onTV(ref, data, metadata)
+        this.props.onKizuna(ref, data, metadata)
       }.bind(this);
     }
-    this.setState(state, callback);
+    if (this.state[ref] !== data) {
+      this.setState(state, callback);
+    } else {
+      callback();
+    }
+  },
+  componentWillUpdate: function(nextProps, nextState) {
+    var watches = this.watches;
+    watches.forEach(function (watch) {
+      if (this.state[watch.ref] !== nextState[watch.ref] &&
+          watch.store.get() !== nextState[watch.ref]) {
+        watch.store.set(nextState[watch.ref], {src: "componentWillUpdate"});
+      }
+    }.bind(this));
   },
   componentWillUnmount: function() {
+    this.removeWatches();
+  },
+  removeWatches: function() {
     var watches = this.watches;
     watches.forEach(function (watch) {
       var store = GetStore(watch.id);
       store.off(watch.callback);
     });
-  },
-  componentWillUpdate: function(nextProps, nextState) {
-    var watches = this.watches;
-    watches.forEach(function (watch) {
-      if (typeof this.state[watch.ref] !== "undefined" &&
-          this.state[watch.ref] !== nextState[watch.ref] &&
-          watch.store.get() !== nextState[watch.ref]) {
-        watch.store.set(nextState[watch.ref], {src: "componentWillUpdate"});
-      }
-    }.bind(this));
   }
 } 
 
 function parseWatchExpr(watchExpr) {
   if (!watchExpr) {
-    return {};
+    return [];
   }
 
   if (Object.prototype.toString.call(watchExpr) != "[object Array]") {
@@ -120,7 +135,7 @@ function parseWatchExpr(watchExpr) {
       id  = watch[1];
       ref = watch[0];
     } else {
-      throw "TV: invalid watch expression";
+      throw "Kizuna: invalid watch expression";
     }
     watches.push({id: id, ref: ref});
   });
@@ -139,5 +154,6 @@ function parseWatchObject(watchExpr) {
 module.exports = {
   Store: Store,
   Mixin: Mixin,
-  get:   GetStore
+
+  getStore: GetStore
 }

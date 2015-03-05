@@ -92,7 +92,9 @@ var Mixin = {
   componentWillUpdate: function(nextProps, nextState) {
     var watches = this.watches;
     watches.forEach(function (watch) {
-      if (this.state[watch.ref] !== nextState[watch.ref]) {
+      if (typeof this.state[watch.ref] !== "undefined" &&
+         this.state[watch.ref] !== nextState[watch.ref] &&
+         watch.store.get() !== nextState[watch.ref]) {
         watch.store.set(nextState[watch.ref], {src: "componentWillUpdate"});
       }
     }.bind(this));
@@ -123,6 +125,6 @@ function parseWatchExpr(watchExpr) {
 
 module.exports = {
   Store: Store,
-  Get:   GetStore,
-  Mixin: Mixin
+  Mixin: Mixin,
+  get:   GetStore
 }

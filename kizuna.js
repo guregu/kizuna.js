@@ -59,7 +59,7 @@ var Mixin = {
       if (watch.store.get() !== this.state[watch.ref]) {
         watch.store.set(this.state[watch.ref]);
       }
-    });
+    }.bind(this));
   },
   componentWillReceiveProps: function(nextProps) {
     var watches = parseBindExpr(nextProps.watch);

@@ -23,8 +23,8 @@ var ParentThing = React.createClass({
     // we bind the children state.clicks to the global "clickCounter" store
     return (
       <div>
-        <ChildThing binding={clicks: "clickCounter"} />
-        <SomeOtherThing binding={clicks: "clickCounter"} />
+        <ChildThing binding={{clicks: "clickCounter"}} />
+        <SomeOtherThing binding={{clicks: "clickCounter"}} />
       </div>
     );
   }
@@ -42,5 +42,5 @@ var ChildThing = React.createClass({
  }
 
 // we bind clicks in our root component to "clickCounter"
-React.render(<ParentThing binding={clicks: "clickCounter"} />, document.getElementById('content'));
+React.render(<ParentThing binding={{clicks: "clickCounter"}} />, document.getElementById('content'));
 ```

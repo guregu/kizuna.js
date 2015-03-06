@@ -50,6 +50,10 @@ var Mixin = {
     this.setupWatches(watches);
   },
   componentDidMount: function() {
+    if (!this.state) {
+      return;
+    }
+    
     var watches = this.watches;
     watches.forEach(function (watch) {
       if (watch.store.get() !== this.state[watch.ref]) {

@@ -11,7 +11,7 @@ function GetStore(id) {
 
 function Store(id) {
   this.id        = id;
-  this.data      = null;
+  this.data      = undefined;
   this.callbacks = [];
 
   this.get = function() {
@@ -46,7 +46,7 @@ function Store(id) {
 
 var Mixin = {
   componentWillMount: function() {
-    var watches = parseWatchExpr(this.props.binding);
+    var watches = parseBindExpr(this.props.binding);
     this.setupWatches(watches);
   },
   componentDidMount: function() {
@@ -58,19 +58,15 @@ var Mixin = {
     });
   },
   componentWillReceiveProps: function(nextProps) {
-    var watches = parseWatchExpr(nextProps.watch);
+    var watches = parseBindExpr(nextProps.watch);
     this.setupWatches(watches);
   },
   setupWatches: function(watches) {
-    if (this.watches && this.watches != watches) {
-      return; // nothing's changed, no need to do anything
-    } else if (this.watches) {
-      this.removeWatches(); 
-    }
+    this.removeWatches(); 
 
     this.watches = [];
     var state    = {};
-    var watches  = parseWatchExpr(this.props.watch);
+    var watches  = parseBindExpr(this.props.binding);
     watches.forEach(function (watch) {
       watch.store = GetStore(watch.id);
       state[watch.ref] = watch.store.get();
@@ -112,13 +108,13 @@ var Mixin = {
   }
 } 
 
-function parseWatchExpr(watchExpr) {
+function parseBindExpr(watchExpr) {
   if (!watchExpr) {
     return [];
   }
 
   if (Object.prototype.toString.call(watchExpr) != "[object Array]") {
-    return parseWatchObject(watchExpr);
+    return parseBindObject(watchExpr);
   }
 
   var watches = [];
@@ -138,7 +134,7 @@ function parseWatchExpr(watchExpr) {
   return watches;
 }
 
-function parseWatchObject(watchExpr) {
+function parseBindObject(watchExpr) {
   var watches = [];
   Object.keys(watchExpr).forEach(function (ref) {
     var id = watchExpr[ref];

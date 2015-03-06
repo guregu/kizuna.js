@@ -48,14 +48,10 @@ var Mixin = {
   componentWillMount: function() {
     var watches = parseBindExpr(this.props.binding);
     this.setupWatches(watches);
-  },
-  componentDidMount: function() {
-    if (!this.state) {
+    if (!this.state) { 
       return;
     }
-    
-    var watches = this.watches;
-    watches.forEach(function (watch) {
+    this.watches.forEach(function (watch) {
       if (watch.store.get() !== this.state[watch.ref]) {
         watch.store.set(this.state[watch.ref]);
       }

@@ -101,6 +101,9 @@ var Mixin = {
   },
   removeWatches: function() {
     var watches = this.watches;
+    if (!watches) {
+      return;
+    }
     watches.forEach(function (watch) {
       var store = GetStore(watch.id);
       store.off(watch.callback);

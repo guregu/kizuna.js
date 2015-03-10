@@ -1,6 +1,6 @@
 var Stores = {};
 
-function GetStore(id) {
+function getStore(id) {
   var store = Stores[id];
   if (!store) {
     store = new Store(id);
@@ -30,12 +30,10 @@ function Store(id) {
   }
 
   this.on = function(callback) {
-    console.log(this.id, "on", callback);
     this.callbacks.push(callback);
   }
 
   this.off = function(callback) {
-    console.log(this.id, "off", callback);
     var idx = this.callbacks.indexOf(callback);
     if (idx == -1) {
       return;
@@ -46,11 +44,12 @@ function Store(id) {
 
 var Mixin = {
   componentWillMount: function() {
-    var watches = parseBindExpr(this.props.binding);
-    this.setupWatches(watches);
+    this.setupWatches();
     if (!this.state) { 
       return;
     }
+
+    // reflect values given in getInitialState()
     this.watches.forEach(function (watch) {
       if (watch.store.get() !== this.state[watch.ref]) {
         watch.store.set(this.state[watch.ref]);
@@ -58,23 +57,7 @@ var Mixin = {
     }.bind(this));
   },
   componentWillReceiveProps: function(nextProps) {
-    var watches = parseBindExpr(nextProps.watch);
-    this.setupWatches(watches);
-  },
-  setupWatches: function(watches) {
-    this.removeWatches(); 
-
-    this.watches = [];
-    var state    = {};
-    var watches  = parseBindExpr(this.props.binding);
-    watches.forEach(function (watch) {
-      watch.store = GetStore(watch.id);
-      state[watch.ref] = watch.store.get();
-      watch.callback = this.receiveUpdate.bind(this, watch.ref);
-      this.watches.push(watch); 
-      watch.store.on(watch.callback);
-    }.bind(this));
-    this.setState(state);
+    this.setupWatches();
   },
   receiveUpdate: function(ref, data, metadata) {
     var state = {};
@@ -88,16 +71,30 @@ var Mixin = {
     this.setState(state, callback);
   },
   componentWillUpdate: function(nextProps, nextState) {
-    var watches = this.watches;
-    watches.forEach(function (watch) {
+    this.watches.forEach(function (watch) {
       if (this.state[watch.ref] !== nextState[watch.ref] &&
           watch.store.get() !== nextState[watch.ref]) {
         watch.store.set(nextState[watch.ref], {src: "componentWillUpdate"});
       }
-    }.bind(this));
+    }, this);
   },
   componentWillUnmount: function() {
     this.removeWatches();
+  },
+  setupWatches: function() {
+    this.removeWatches(); 
+
+    this.watches = [];
+    var state    = {};
+    var watches  = parseBindExpr(this.props.binding);
+    watches.forEach(function (watch) {
+      watch.store = getStore(watch.id);
+      state[watch.ref] = watch.store.get();
+      watch.callback = this.receiveUpdate.bind(this, watch.ref);
+      this.watches.push(watch); 
+      watch.store.on(watch.callback);
+    }, this);
+    this.setState(state);
   },
   removeWatches: function() {
     var watches = this.watches;
@@ -105,23 +102,23 @@ var Mixin = {
       return;
     }
     watches.forEach(function (watch) {
-      var store = GetStore(watch.id);
+      var store = getStore(watch.id);
       store.off(watch.callback);
     });
   }
 } 
 
-function parseBindExpr(watchExpr) {
-  if (!watchExpr) {
+function parseBindExpr(bindExpr) {
+  if (!bindExpr) {
     return [];
   }
 
-  if (Object.prototype.toString.call(watchExpr) != "[object Array]") {
-    return parseBindObject(watchExpr);
+  if (Object.prototype.toString.call(bindExpr) != "[object Array]") {
+    return parseBindObject(bindExpr);
   }
 
   var watches = [];
-  watchExpr.forEach(function (watch) {
+  bindExpr.forEach(function (watch) {
     var id, ref;
     if (typeof watch == "string") {
       id  = watch;
@@ -137,10 +134,10 @@ function parseBindExpr(watchExpr) {
   return watches;
 }
 
-function parseBindObject(watchExpr) {
+function parseBindObject(bindExpr) {
   var watches = [];
-  Object.keys(watchExpr).forEach(function (ref) {
-    var id = watchExpr[ref];
+  Object.keys(bindExpr).forEach(function (ref) {
+    var id = bindExpr[ref];
     watches.push({id: id, ref: ref});
   });
   return watches;
@@ -150,5 +147,5 @@ module.exports = {
   Store: Store,
   Mixin: Mixin,
 
-  getStore: GetStore
+  getStore: getStore
 }

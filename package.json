@@ -1,6 +1,6 @@
 {
   "name": "kizuna",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "two-way binding global data store thing for React",
   "main": "kizuna.js",
   "repository": {

@@ -51,7 +51,7 @@ var Mixin = {
 
     // reflect values given in getInitialState()
     this.watches.forEach(function (watch) {
-      if (watch.store.get() !== this.state[watch.ref]) {
+      if (this.state[watch.ref] !== undefined && watch.store.get() !== this.state[watch.ref]) {
         watch.store.set(this.state[watch.ref]);
       }
     }.bind(this));
